@@ -10,7 +10,7 @@ class DistanceMatrix:
         self.distances = distance_matrix(input_data, input_data)
 
     def get_knn(self, k: int, index: int = None) -> List:
-        """ Get the indices of the k-neares neighbours
+        """ Get the indices of the k-nearest neighbours
         If index is none return knn for all input data samples (matrix)
 
         Args
@@ -47,14 +47,13 @@ class DistanceMatrix:
             return [row[row != idx] for idx, row in enumerate(close_samples)]
 
 
-
 class NeighbourhoodGraph:
-    def __init__(self, unit_weights=[], m=None, n=None, input_data:np.ndarray=[], distance_mat:np.ndarray=None):
+    def __init__(self, unit_weights=[], m=None, n=None, input_data: np.ndarray = [], distance_mat: np.ndarray = None):
         if m * n != len(unit_weights):
             print("Weigths and specified input dimensions m & n do not match")
             return
-        
-        if len(unit_weights)==0 or not m or not n or len(input_data)==0:
+
+        if len(unit_weights) == 0 or not m or not n or len(input_data) == 0:
             print("You need to specify all relevant arguments: weights, m, n, input_data")
 
         self.unit_weights = unit_weights
@@ -67,7 +66,7 @@ class NeighbourhoodGraph:
         else:
             self.distance_mat = distance_mat
 
-    def create_graph(self, radius:float=None, knn:int=None) -> np.ndarray:
+    def create_graph(self, radius: float = None, knn: int = None) -> np.ndarray:
         """
         Create an adjecency matrix representing the Neighbourhood graph
         Use KNN or Radius Approach depending on which argument is specified
@@ -80,12 +79,12 @@ class NeighbourhoodGraph:
         Returns:
             np.ndarray: The Adjacancy Matrix representing the Neighbourhood Graph
         """
-        adjacancy_mat = np.zeros((self.n,self.m))
+        adjacancy_mat = np.zeros((self.n * self.m, self.n * self.m))
         if knn is not None:
             neighbours = self.distance_mat.get_knn(knn)
         elif radius is not None:
             neighbours = self.distance_mat.get_samples_in_radius(radius)
-        
+
         for index, neighbour_idxs in enumerate(neighbours):
             bmu = self.get_bmu(index)
             for neighbour_idx in neighbour_idxs:
@@ -94,11 +93,11 @@ class NeighbourhoodGraph:
                     adjacancy_mat[bmu, neighbour_bmu] = 1
 
         return adjacancy_mat
-    
+
     def get_bmu(self, index) -> int:
         """
-        Get Best Matching Unit of a input samle
-        Use the Eukleadian Distance (L2) to find BMU
+        Get Best Matching Unit of an input sample
+        Use the Euclidean Distance (L2) to find BMU
 
         Args:
             index (int): Index of the input sample
@@ -109,21 +108,27 @@ class NeighbourhoodGraph:
         return np.argmin(np.sqrt(np.sum(np.power(self.unit_weights - self.input_data[index], 2), axis=1)))
 
 
-
-if __name__ =="__main__":
-    from Utilities import SOMToolBox_Parse
+if __name__ == "__main__":
+    from src.Utilities import SOMToolBox_Parse
     from sklearn import datasets, preprocessing
 
     iris = datasets.load_iris().data
-    min_max_scaler = preprocessing.MinMaxScaler()
-    iris = min_max_scaler.fit_transform(iris)
+    #min_max_scaler = preprocessing.MinMaxScaler()
+    #iris = min_max_scaler.fit_transform(iris)
+    print(iris.shape)
+    print(iris[:,:])
 
     smap = SOMToolBox_Parse('../input/iris/iris.wgt.gz')
-    smap, sdim, smap_x, smap_y = smap.read_weight_file()
+    s_weights, sdim, smap_x_dim, smap_y_dim = smap.read_weight_file()
+    s_weights = s_weights.to_numpy()
+    print(s_weights.shape)
+    print(s_weights)
     print(sdim)
+    print(smap_x_dim)
+    print(smap_y_dim)
 
-    ng = NeighbourhoodGraph(smap._weights.reshape(-1,4), m, n, iris)
+    ng = NeighbourhoodGraph(s_weights, smap_x_dim, smap_y_dim, input_data=iris)
 
-    adj_mat = ng.create_graph(3)
+    adj_mat = ng.create_graph(knn=3)
 
-    print(adj_mat)
+    print(adj_mat[:,:])

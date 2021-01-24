@@ -1,0 +1,9 @@
+outputDirectory=SOM_Neighbourhood_Graphs/input/chainlink/chainlink10060
+namePrefix=chainlink
+vectorFileName=SOM_Neighbourhood_Graphs/input/chainlink/chainlink.vec
+templateFileName=SOM_Neighbourhood_Graphs/input/chainlink/chainlink.tv
+xSize=100
+ySize=60
+learnRate=0.7
+numIterations=10000
+sigma=7

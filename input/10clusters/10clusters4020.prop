@@ -1,0 +1,8 @@
+outputDirectory=SOM_Neighbourhood_Graphs/input/10clusters/10clusters4020
+namePrefix=10clusters
+vectorFileName=SOM_Neighbourhood_Graphs/input/10clusters/10clusters.vec
+templateFileName=SOM_Neighbourhood_Graphs/input/10clusters/10clusters.tv
+xSize=40
+ySize=20
+learnRate=0.7
+numCycles=1000

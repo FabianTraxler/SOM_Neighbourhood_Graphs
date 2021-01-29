@@ -183,5 +183,5 @@ if __name__ == "__main__":
     s_weights = s_weights.to_numpy()
 
     ng_iris = NeighbourhoodGraph(s_weights, smap_x_dim, smap_y_dim, input_data=iris)
-    trace = ng_iris.get_trace(knn=3)
+    trace = ng_iris.get_trace(radius=0.5)
     go.FigureWidget(data=trace, layout=go.Layout(width=500, height=500, title="title")).show()

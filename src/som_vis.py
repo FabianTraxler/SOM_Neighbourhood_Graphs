@@ -1,6 +1,9 @@
+# %%
+
 import pandas as pd
 import numpy as np
 import gzip
+
 from scipy.spatial import distance_matrix, distance
 from ipywidgets import Layout, HBox, Box, widgets, interact
 import plotly.graph_objects as go
@@ -57,9 +60,10 @@ class SOMToolBox_Parse:
         return xdim, ydim, vec_dim
 
 
+# %%
 class SomViz:
 
-    def __init__(self, weights=[], m=None, n=None):
+    def __init__(self, weights, m, n):
         self.weights = weights
         self.m = m
         self.n = n
@@ -97,7 +101,7 @@ class SomViz:
         if som_map == None:
             return self.plot(self.weights[:, component].reshape(-1, self.n), color=color, interp=interp, title=title)
         else:
-            som_map.data[0].z = self.weights[:, component].reshape(-1, n)
+            som_map.data[0].z = self.weights[:, component].reshape(-1, self.n)
 
     def sdh(self, som_map=None, idata=[], sdh_type=1, factor=1, draw=True, color="Cividis", interp="best", title=""):
 
@@ -198,3 +202,40 @@ class SomViz:
     def plot(self, matrix, color="Viridis", interp="best", title=""):
         return go.FigureWidget(go.Heatmap(z=matrix, zsmooth=interp, showscale=False, colorscale=color),
                                layout=go.Layout(width=700, height=700, title=title, title_x=0.5, ))
+
+
+if __name__ == "__main__":
+    from sklearn import datasets, preprocessing
+    from src.NeighbourhoodGraph import NeighbourhoodGraph
+
+    iris = datasets.load_iris().data
+    # min_max_scaler = preprocessing.MinMaxScaler()
+    # iris = min_max_scaler.fit_transform(iris)
+
+    smap = SOMToolBox_Parse('../input/iris/iris.wgt.gz')
+    s_weights, sdim, smap_x_dim, smap_y_dim = smap.read_weight_file()
+    s_weights = s_weights.to_numpy()
+
+    ng_iris = NeighbourhoodGraph(s_weights, smap_x_dim, smap_y_dim, input_data=iris)
+    ng_iris_trace_3nn = ng_iris.get_trace(knn=3)
+
+    go.FigureWidget(data=ng_iris_trace_3nn,
+                    layout=go.Layout(width=700, height=700, title="Iris: NeighbourhoodGraph (3-NN)")).show()
+
+    vis_iris = SomViz(s_weights, smap_x_dim, smap_y_dim)
+    um_iris = vis_iris.umatrix(title="Iris: Umatrix + NeighbourhoodGraph (3-NN)")
+    um_iris.add_trace(ng_iris_trace_3nn)
+    um_iris.show()
+
+    # We can reuse all traces
+    ng_iris_trace_05r = ng_iris.get_trace(radius=0.5)
+
+    um_iris.data = [um_iris.data[0]]
+    um_iris.add_trace(ng_iris_trace_05r)
+    um_iris.layout = go.Layout(width=700, height=700, title="Iris: Umatrix + NeighbourhoodGraph (0.5 Radius)",
+                               title_x=0.5, )
+    um_iris.show()
+
+    hithist_iris = vis_iris.hithist(idata=iris, title="Iris: HisHist + NeighbourhoodGraph (3-NN)")
+    hithist_iris.add_trace(ng_iris_trace_3nn)
+    hithist_iris.show()

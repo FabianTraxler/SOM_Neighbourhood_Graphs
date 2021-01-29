@@ -1,8 +1,9 @@
 ipywidgets==7.4.2
 matplotlib==3.0.2
 MiniSom==2.1.5
-numpy==1.15.4
+numpy~=1.19.2
 pandas==1.1.4
 plotly==4.12.0
-scipy==1.1.0
+scipy~=1.5.2
 scikit-learn==0.23.2
+networkx~=2.5

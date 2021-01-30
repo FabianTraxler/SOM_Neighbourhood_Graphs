@@ -1,3 +1,16 @@
+# -*- coding: utf-8 -*-
+"""Neighbourhood Graph Visualization Tool
+
+This module is used to ceate a Neighbourhood graph based on a trained SOM.
+Therefore the Class NeighbourhoodGraph should be used to initialize the Neighbourhood graph.
+
+After initilaiztation the instance can be used to generate a so called trace which sould be overlayed over any other visulaization (eg. U-Matrix)
+
+@author Lukas Lehner
+@author Fabian Traxler
+"""
+
+
 import numpy as np
 from scipy import spatial
 from typing import List
@@ -6,8 +19,14 @@ import networkx as nx
 
 
 class DistanceMatrix:
-
+    """ Class to claculate the distances between Input data and derive the neighbours of each datapoint"""
     def __init__(self, input_data: np.ndarray = []):
+        """
+        Initilaize the Distance Matrix with the input data.
+
+        Args:
+            input_data (np.ndarray): The Input data used for training the SOM (also possible to use different data in same dimension)
+        """
         self.distance_matrix = spatial.distance_matrix(input_data, input_data)
 
     def get_knn(self, k: int, index: int = None) -> List:
@@ -51,16 +70,21 @@ class DistanceMatrix:
 
 
 class NeighbourhoodGraph:
+    """Class representing the Neighbourhood Graph with functions to visualize the traces"""
+
     def __init__(self, unit_weights: np.ndarray, m: int, n: int, input_data: np.ndarray,
                  distance_mat: DistanceMatrix = None, bmu_array: np.ndarray = None):
         """
-        # todo
-        :param unit_weights:
-        :param m:
-        :param n:
-        :param input_data:
-        :param distance_mat: Optional. A DistanceMatrix class object containing the distance matrix corresponding to input_data.
-        :param bmu_array: Optional. A one-dimensional array of unit indices. Length must match input_data length.
+        Initilaize the NeighbourhoodGraph Instance with the trained SOM and the used input data.
+
+        Args:
+            unit_weights (np.ndarray): The Weights of the Units in Input space
+            m (int): Height of the SOM
+            n (int): Width of the SOM
+            input_data (np.ndarray): The Input data used for training the SOM (also possible to use different data in same dimension)
+            distance_mat (DistanceMatirx): The distance Matrix representing the distance of between the input data
+            bmu_array (np.ndarray): Best matching Unit for ever input data
+
         """
 
         assert m * n == len(unit_weights), \
@@ -123,16 +147,20 @@ class NeighbourhoodGraph:
         return adjacency_mat
 
     def get_trace(self, radius: float = None, knn: int = None, adjacency_matrix: np.ndarray = None,
-                  line_width: float = 3, line_color='#fff', pos: dict = None) -> go.Scatter:
+                  line_width: float = 3, line_color:str='#fff', pos: dict = None) -> go.Scatter:
         """
-        # todo
-        :param radius:
-        :param knn:
-        :param adjacency_matrix:
-        :param line_width:
-        :param line_color:
-        :param pos:
-        :return:
+        Calculate the Traces between the input data and visualize the traces
+        as a plotly Graph_Object
+
+        Args:
+            radius (float): Radius size (if specified use radius method)
+            knn (int): Number of neighbours (if specified use KNN)
+            adjacency_matrix (np.ndarray): The Adjacency matrix calculated using KNN or the Radius Method
+            line_width (float): The width of the Traces
+            line_color (str): The color of the traces (in HEX Hash)
+            pos (dict): The position of the Units in the SOM Space (2d)
+        Returns:
+            plotly.graph_objects.Scatter: A Scatter Plot Object
         """
         if adjacency_matrix is None:
             adjacency_matrix = self.calc_adjacency_matrix(radius, knn)

@@ -9,8 +9,6 @@ After initilaiztation the instance can be used to generate a so called trace whi
 @author Lukas Lehner
 @author Fabian Traxler
 """
-
-
 import numpy as np
 from scipy import spatial
 from typing import List

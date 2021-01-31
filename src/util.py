@@ -36,9 +36,9 @@ def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
         height (int): Height of the plots
         scale_to_mean (bool): Specify if data should be scaled (only relevant for Radius method)
         show_hithist (bool): Specify if also a HitHistogram should be used
-        save_dir (str):
-        save_file_type (str):
-        display_mode (bool):
+        save_dir (str): If specified, all plots are stored in this directory
+        save_file_type (str): String of file type plots should be saves as. E.g.: "png", "svg"
+        display_mode (bool): If true, IPython.core.display.display is used to display the figures. fig.show() is used otherwise
     """
     # Visualization
     viz = SomViz(sweights, smap_y, smap_x)

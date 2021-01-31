@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 """Neighbourhood Graph Visualization Tool
 
-This module is used to ceate a Neighbourhood graph based on a trained SOM.
+This module is used to create a Neighbourhood Graph based on a trained SOM.
 Therefore the Class NeighbourhoodGraph should be used to initialize the Neighbourhood graph.
 
-After initilaiztation the instance can be used to generate a so called trace which sould be overlayed over any other visulaization (eg. U-Matrix)
+After initialization the instance can be used to generate a so called trace which can be displayed over any other visualization (eg. U-Matrix)
 
 @author Lukas Lehner
 @author Fabian Traxler
@@ -17,27 +17,28 @@ import networkx as nx
 
 
 class DistanceMatrix:
-    """ Class to claculate the distances between Input data and derive the neighbours of each datapoint"""
+    """ Class to calculate the (euclidean) distance between each input data sample
+     and derive the knn- or radius-based neighbourhood of each sample in input space."""
     def __init__(self, input_data: np.ndarray = []):
         """
-        Initilaize the Distance Matrix with the input data.
+        Initialize the Distance Matrix with the input data.
 
         Args:
-            input_data (np.ndarray): The Input data used for training the SOM (also possible to use different data in same dimension)
+            input_data (np.ndarray): The input data used for training the SOM (also possible to use different data in same dimension)
         """
         self.distance_matrix = spatial.distance_matrix(input_data, input_data)
 
     def get_knn(self, k: int, index: int = None) -> List:
         """
-        Get the indices of the k-nearest neighbours
-        If index is none return knn for all input data samples (matrix)
+        Get the indices of the k-nearest neighbours.
+        If index is none return knn for all input data samples (matrix).
 
         Args
             k (int): Number of nearest neighbours to look for
             index (int): Index of the sample in focus
 
         Return
-            List[int]: Integer indices of the neighbours
+            List[int]: Integer indices of the neighbouring samples
         """
         if index is not None:
             neighbours = self.distance_matrix[index].argsort()[
@@ -49,15 +50,15 @@ class DistanceMatrix:
 
     def get_samples_in_radius(self, radius: float, index: int = None) -> List:
         """
-        Get the indices of the samples which lie within a specified radius of the index-sample
-        If index is none return samples in radius for all input data samples (matrix)
+        Get the indices of the samples which lie within a specified radius of the index-sample.
+        If index is none return samples in radius for all input data samples (matrix).
 
         Args
-            radius (float): radius of the Hypersphere around the index-sample
+            radius (float): Radius of the hypersphere around the index-sample
             index (int): Index of the sample in focus
 
         Return
-            List[int]: Integer indices of the close samples
+            List[int]: Integer indices of samples in the hypersphere
         """
         if index is not None:
             close_samples = np.where(self.distance_matrix[index] < radius)[0]
@@ -68,21 +69,20 @@ class DistanceMatrix:
 
 
 class NeighbourhoodGraph:
-    """Class representing the Neighbourhood Graph with functions to visualize the traces"""
+    """Class representing the Neighbourhood Graph, including functions for visualization."""
 
     def __init__(self, unit_weights: np.ndarray, m: int, n: int, input_data: np.ndarray,
                  distance_mat: DistanceMatrix = None, bmu_array: np.ndarray = None):
         """
-        Initilaize the NeighbourhoodGraph Instance with the trained SOM and the used input data.
+        Initialize the NeighbourhoodGraph Instance with the trained SOM and the used input data.
 
         Args:
             unit_weights (np.ndarray): The Weights of the Units in Input space
             m (int): Height of the SOM
             n (int): Width of the SOM
             input_data (np.ndarray): The Input data used for training the SOM (also possible to use different data in same dimension)
-            distance_mat (DistanceMatirx): The distance Matrix representing the distance of between the input data
-            bmu_array (np.ndarray): Best matching Unit for ever input data
-
+            distance_mat (DistanceMatrix): Optional: A Matrix representing the distance between each input data sample. If none is provided, the Distance Matrix is calculated using input_data.
+            bmu_array (np.ndarray): Optional: Best Matching Unit for each input data sample. If none is provided, the array is calculated using unit_weights and input_data.
         """
 
         assert m * n == len(unit_weights), \
@@ -98,9 +98,9 @@ class NeighbourhoodGraph:
 
     def calc_bmu_array(self, _unit_weights: np.ndarray, _input_data: np.ndarray) -> np.ndarray:
         """
-        Calculate Best Matching Unit for every sample
-        Use the Euclidean Distance (L2) to find BMUs
-        If multiple units have the same distance to a sample, the unit with the lowest index is chosen
+        Calculate Best Matching Unit for every sample.
+        Use the Euclidean Distance (L2) to find BMUs.
+        If multiple units have the same distance to a sample, the unit with the lowest index is chosen.
         Args:
             _unit_weights (ndarray): Trained unit weights
             _input_data (ndarray): Input data
@@ -113,12 +113,12 @@ class NeighbourhoodGraph:
 
     def calc_adjacency_matrix(self, radius: float = None, knn: int = None) -> np.ndarray:
         """
-        Calculate the adjacency matrix of the Neighbourhood Graph corresponding to the specified neighbourhood
-        Use KNN or Radius Approach to define neighbourhood (depending on which argument is specified - if both are specified KNN is used)
+        Calculate the adjacency matrix of the Neighbourhood Graph corresponding to the specified neighbourhood.
+        Use KNN or Radius Approach to define neighbourhood (depends on which argument is specified - if both are specified KNN is used)
 
         Args:
-            radius (float): Radius size (if specified use radius method)
-            knn (int): Number of neighbours (if specified use KNN)
+            radius (float): Radius size (if specified, use radius method)
+            knn (int): Number of neighbours (if specified, use KNN)
 
         Returns:
             np.ndarray: The Adjacency Matrix of the Neighbourhood Graph
@@ -147,16 +147,15 @@ class NeighbourhoodGraph:
     def get_trace(self, radius: float = None, knn: int = None, adjacency_matrix: np.ndarray = None,
                   line_width: float = 3, line_color:str='#fff', pos: dict = None) -> go.Scatter:
         """
-        Calculate the Traces between the input data and visualize the traces
-        as a plotly Graph_Object
+        Build a plotly Scatter Plot of the Neighbourhood Graph (can be used as trace in a FigureWidget).
 
         Args:
             radius (float): Radius size (if specified use radius method)
             knn (int): Number of neighbours (if specified use KNN)
-            adjacency_matrix (np.ndarray): The Adjacency matrix calculated using KNN or the Radius Method
-            line_width (float): The width of the Traces
-            line_color (str): The color of the traces (in HEX Hash)
-            pos (dict): The position of the Units in the SOM Space (2d)
+            adjacency_matrix (np.ndarray): Optional: An adjacency matrix of a Neighbourhood Graph. If none is provided, an adjacency matrix is calculated based on the specified neighbourhood parameter (radius or knn).
+            line_width (float): The width of the edges in the plot
+            line_color (str): The color of the edges (in HEX Hash)
+            pos (dict): Optional: The position of the Units in the 2D plot. If none is provided, the units are laid out on an m x n grid with cell size=1.
         Returns:
             plotly.graph_objects.Scatter: A Scatter Plot Object
         """

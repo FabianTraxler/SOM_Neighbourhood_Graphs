@@ -91,7 +91,8 @@ def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
         if save_dir is not None:
             fig.write_image(save_dir + save_file_title + save_file_suffix + "." + save_file_type)
 
-        if display_mode:
+                if display_mode:
             display(fig)
         else:
             fig.show()
+

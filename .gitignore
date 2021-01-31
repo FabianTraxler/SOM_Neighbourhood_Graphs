@@ -2,6 +2,12 @@ bin/
 etc/
 pyvenv.cfg
 share/
+submission
+submission.zip
+.DS_Store
+.DS_Store/
+.vscode/
+PDFs/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -1,5 +1,7 @@
 # %%
-
+"""
+This module contains copies of the classes SOMToolBox_Parse and SomViz provided by the lecturers.
+"""
 import pandas as pd
 import numpy as np
 import gzip

@@ -16,8 +16,8 @@ def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
                           width=700, height=None,
                           scale_to_mean=False,
                           show_hithist=False,
-                          save_dir=None,
-                          save_file_type="svg"):
+                          save_dir=None, save_file_type="svg",
+                          display_mode=False):
     """
     Create multiple Visualizations with different Parameters at once
     Displays a plot for every parameter in k_list, and r_list
@@ -36,6 +36,9 @@ def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
         height (int): Height of the plots
         scale_to_mean (bool): Specify if data should be scaled (only relevant for Radius method)
         show_hithist (bool): Specify if also a HitHistogram should be used
+        save_dir (str):
+        save_file_type (str):
+        display_mode (bool):
     """
     # Visualization
     viz = SomViz(sweights, smap_y, smap_x)
@@ -88,5 +91,7 @@ def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
         if save_dir is not None:
             fig.write_image(save_dir + save_file_title + save_file_suffix + "." + save_file_type)
 
-        fig.show()
-
+        if display_mode:
+            display(fig)
+        else:
+            fig.show()

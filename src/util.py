@@ -5,8 +5,8 @@ import numpy as np
 from IPython.core.display import display
 from ipywidgets import HBox
 
-from src.NeighbourhoodGraph import NeighbourhoodGraph
-from src.som_vis import SomViz
+from NeighbourhoodGraph import NeighbourhoodGraph
+from som_vis import SomViz
 
 
 def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
@@ -88,5 +88,5 @@ def create_visualizations(sweights: np.ndarray, smap_y: int, smap_x: int, idata,
         if save_dir is not None:
             fig.write_image(save_dir + save_file_title + save_file_suffix + "." + save_file_type)
 
-        display(fig)
+        fig.show()
 
